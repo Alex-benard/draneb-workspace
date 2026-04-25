@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Draneb Brand Intelligence — Operational Workspace</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g900:#011a0e;--g800:#012a18;--g700:#014020;--g600:#006633;--g500:#008844;
+  --g400:#00aa55;--g300:#33cc77;--g200:#99eebb;--g100:#ddf5e8;--g50:#f2fbf6;
+  --gold:#c8960c;--gold-lt:#fff3cc;
+  --red:#cc2200;--red-bg:#fff2f0;
+  --blue:#1a5fa8;--blue-bg:#f0f6ff;
+  --text:#12241a;--text2:#3a5c45;--text3:#7aaa8a;
+  --border:#d4e8da;--border2:#b8d8c4;
+  --bg:#f4f9f6;--white:#fff;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono','Courier New',monospace;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,60,20,.08),0 4px 12px rgba(0,60,20,.06);
+  --shadow-lg:0 4px 20px rgba(0,60,20,.12),0 1px 4px rgba(0,60,20,.08);
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+h1,h2,h3,h4{font-weight:600;line-height:1.3}
+input,select,textarea,button{font-family:var(--font);font-size:14px}
+button{cursor:pointer}
+.app{display:flex;height:100vh;overflow:hidden}
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--g900);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sidebar::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,136,68,.08) 0%,transparent 60%);pointer-events:none}
+.sb-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-brand-name{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.3px;line-height:1.2}
+.sb-brand-name span{color:var(--g300)}
+.sb-brand-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.5px;margin-top:3px}
+.sb-badge{display:inline-block;margin-top:8px;font-size:9px;letter-spacing:1px;background:rgba(0,170,85,.2);color:var(--g300);border:1px solid rgba(0,170,85,.3);padding:2px 8px;border-radius:20px}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 0}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.sb-section{font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,.25);padding:10px 18px 4px;font-weight:500}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;margin:1px 8px;border-radius:8px;font-size:13px;color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;position:relative}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(0,170,85,.18);color:#fff}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--g400);border-radius:2px}
+.nav-icon{width:16px;text-align:center;font-size:14px;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:600;background:var(--red);color:#fff;padding:1px 6px;border-radius:10px;min-width:20px;text-align:center}
+.nav-badge-gold{background:var(--gold)}
+.sb-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:rgba(255,255,255,.3)}
+.sb-footer strong{color:rgba(255,255,255,.6);display:block;margin-bottom:2px}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:600}
+.topbar-sub{font-size:12px;color:var(--text3);margin-left:4px}
+.topbar-actions{margin-left:auto;display:flex;gap:8px}
+.content{flex:1;overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.view{display:none}
+.view.active{display:block}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-weight:500;font-size:13px;border:none;transition:all .15s;text-decoration:none}
+.btn-primary{background:var(--g600);color:#fff}
+.btn-primary:hover{background:var(--g500)}
+.btn-outline{background:transparent;color:var(--g600);border:1px solid var(--border2)}
+.btn-outline:hover{background:var(--g50);border-color:var(--g600)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.9}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc-green::after{background:var(--g500)}.sc-gold::after{background:var(--gold)}.sc-red::after{background:var(--red)}.sc-blue::after{background:var(--blue)}
+.stat-val{font-size:28px;font-weight:700;line-height:1;color:var(--text);margin-bottom:4px}
+.stat-lbl{font-size:11px;color:var(--text3);font-weight:500}
+.stat-delta{font-size:10px;margin-top:4px;color:var(--g500)}
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--text3);text-transform:uppercase;padding:10px 12px;text-align:left;background:var(--g50);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid.c1{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:500;color:var(--text2)}
+.field input,.field select,.field textarea{padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--white);color:var(--text);font-size:13px;transition:border-color .15s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g500);box-shadow:0 0 0 3px rgba(0,136,68,.1)}
+.field textarea{resize:vertical;min-height:80px}
+.ff{grid-column:1/-1}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.b-green{background:#e0f5eb;color:#007733}.b-red{background:#fdecea;color:#cc2200}
+.b-gold{background:#fff3cc;color:#996600}.b-blue{background:#e6f0ff;color:#1a5fa8}
+.b-gray{background:#f0f4f2;color:#5a7a6a}.b-orange{background:#fff0e0;color:#cc5500}
+.tier-Starter{background:#e0f5eb;color:#007733;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.tier-Standard{background:#e6f0ff;color:#1a5fa8;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.tier-Command{background:#fdecea;color:#cc2200;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,20,10,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:14px;width:100%;max-width:580px;max-height:90vh;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden}
+.modal-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-hdr h3{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;font-size:20px;color:var(--text3);padding:2px 6px;border-radius:4px;cursor:pointer}
+.modal-body{padding:22px;overflow-y:auto;flex:1}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
+/* EMPTY */
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:6px}
+/* ALERTS */
+.alert{padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:12px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.alert-warn{background:#fff8e6;border-left:3px solid var(--gold)}.alert-success{background:#e0f5eb;border-left:3px solid var(--g500)}
+.alert-info{background:var(--blue-bg);border-left:3px solid var(--blue)}.alert-error{background:var(--red-bg);border-left:3px solid var(--red)}
+/* PROGRESS */
+.progress-wrap{background:var(--g100);border-radius:4px;height:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--g500);transition:width .5s}
+/* TOAST */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--g900);color:#fff;padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease;min-width:240px}
+.toast-success{border-left:3px solid var(--g400)}.toast-error{border-left:3px solid var(--red)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+/* DOC OUTPUT */
+.doc-out{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:36px;font-family:Georgia,serif;line-height:1.8;max-width:740px;margin:0 auto}
+.doc-out h1{font-size:20px;color:var(--g900);border-bottom:2px solid var(--g600);padding-bottom:8px;margin-bottom:8px}
+.doc-out h2{font-size:14px;color:var(--g700);margin-top:22px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-family:var(--font)}
+.doc-out p{margin-bottom:10px;font-size:13.5px}
+.doc-out table{width:100%;border-collapse:collapse;margin:10px 0}
+.doc-out td,.doc-out th{border:1px solid #ccc;padding:7px 10px;font-size:12.5px}
+.doc-out th{background:#f0f0f0;font-weight:600}
+.doc-ref{font-family:monospace;font-size:12px;background:#f5f5f5;padding:2px 6px;border-radius:3px}
+/* VAULT */
+.vault-hdr{background:linear-gradient(135deg,var(--g900),#023020);border-radius:var(--radius);padding:24px;color:#fff;margin-bottom:18px}
+.vault-hdr h2{font-size:18px;margin-bottom:6px}
+.vault-hdr p{font-size:13px;color:rgba(255,255,255,.6)}
+.vault-case{font-family:var(--mono);font-size:22px;color:var(--g300);margin:10px 0 4px;letter-spacing:2px}
+@media print{.sidebar,.topbar,.modal-footer,.btn,.no-print,nav{display:none!important}.content{padding:0!important}.doc-out{border:none;padding:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-name"><span>Draneb</span> Brand<br>Intelligence</div>
+    <div class="sb-brand-sub">FRAUD MONITORING WORKSPACE</div>
+    <div class="sb-badge">● OPERATIONAL</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">MAIN</div>
+    <div class="nav-item active" onclick="nav('dashboard')"><span class="nav-icon">⬡</span> Dashboard</div>
+    <div class="nav-item" onclick="nav('clients')"><span class="nav-icon">👤</span> Clients <span class="nav-badge nav-badge-gold" id="nb-clients">0</span></div>
+    <div class="sb-section">INTELLIGENCE</div>
+    <div class="nav-item" onclick="nav('tracker')"><span class="nav-icon">🎯</span> Scammer Tracker <span class="nav-badge" id="nb-threats">0</span></div>
+    <div class="nav-item" onclick="nav('whistle')"><span class="nav-icon">🔒</span> Whistleblower Vault <span class="nav-badge nav-badge-gold" id="nb-tips">0</span></div>
+    <div class="sb-section">DOCUMENTS</div>
+    <div class="nav-item" onclick="nav('briefs')"><span class="nav-icon">📋</span> Brief Generator</div>
+    <div class="nav-item" onclick="nav('dci')"><span class="nav-icon">⚖️</span> DCI Report Builder</div>
+    <div class="nav-item" onclick="nav('takedown')"><span class="nav-icon">📩</span> Takedown Letters</div>
+    <div class="sb-section">ACCOUNT</div>
+    <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+  </div>
+  <div class="sb-footer"><strong id="sb-analyst">Alex Benard</strong>Draneb Writing &amp; Research Services</div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div><div class="topbar-title" id="tb-title">Dashboard</div><span class="topbar-sub" id="tb-sub">Overview of all active intelligence operations</span></div>
+    <div class="topbar-actions" id="tb-actions"></div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card sc-green"><div class="stat-val" id="ds-cl">0</div><div class="stat-lbl">Active Clients</div><div class="stat-delta" id="ds-cl-s">-</div></div>
+        <div class="stat-card sc-red"><div class="stat-val" id="ds-th">0</div><div class="stat-lbl">Active Fake Accounts</div><div class="stat-delta" id="ds-th-s">0 new today</div></div>
+        <div class="stat-card sc-gold"><div class="stat-val" id="ds-ti">0</div><div class="stat-lbl">Whistleblower Tips</div><div class="stat-delta">Total received</div></div>
+        <div class="stat-card sc-blue"><div class="stat-val" id="ds-dc">0</div><div class="stat-lbl">DCI Reports Filed</div><div class="stat-delta">All time</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card"><div class="card-title">🎯 Recent Fake Accounts</div><div id="d-threats"></div></div>
+        <div class="card">
+          <div class="card-title">👤 Clients by Tier</div><div id="d-tiers"></div>
+          <div style="margin-top:18px"><div class="card-title">📈 Revenue</div><div id="d-rev"></div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">🔔 Action Items</div><div id="d-actions"></div></div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="view" id="view-clients">
+      <div class="card"><div class="tbl-wrap">
+        <table><thead><tr><th>Client / Brand</th><th>Sector</th><th>Tier</th><th>Monthly</th><th>Active Threats</th><th>Since</th><th>Status</th><th></th></tr></thead>
+        <tbody id="cl-tbody"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- TRACKER -->
+    <div class="view" id="view-tracker">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <select id="tf-client" style="padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;font-size:13px" onchange="renderTracker()"><option value="">All Clients</option></select>
+        <select id="tf-status" style="padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;font-size:13px" onchange="renderTracker()">
+          <option value="">All Statuses</option><option>Active</option><option>DCI Reported</option><option>Taken Down</option><option>Monitoring</option>
+        </select>
+        <select id="tf-plat" style="padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:#fff;font-size:13px" onchange="renderTracker()">
+          <option value="">All Platforms</option><option>Facebook</option><option>TikTok</option><option>WhatsApp</option><option>Instagram</option><option>Telegram</option><option>Other</option>
+        </select>
+      </div>
+      <div class="card"><div class="tbl-wrap">
+        <table><thead><tr><th>Fake Account</th><th>Client</th><th>Platform</th><th>Phone/Till</th><th>Victims</th><th>Found</th><th>Status</th><th>Evidence</th><th></th></tr></thead>
+        <tbody id="tr-tbody"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- WHISTLEBLOWER -->
+    <div class="view" id="view-whistle">
+      <div class="vault-hdr">
+        <h2>🔒 Encrypted Whistleblower Vault</h2>
+        <p>Victims submit confidential reports. Shared only with the client's authorized representative.</p>
+        <div class="vault-case" id="wh-next">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35)">NEXT CASE NUMBER</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-title">📥 Submit Victim Report</div>
+          <div class="form-grid c1" style="gap:11px">
+            <div class="field"><label>Victim Name (or Anonymous)</label><input id="wh-vname" placeholder="Jane Doe / Anonymous"></div>
+            <div class="field"><label>Victim Phone</label><input id="wh-vphone" placeholder="+254 7XX XXX XXX"></div>
+            <div class="field"><label>Fake Account That Targeted You</label><input id="wh-acct" placeholder="e.g. 'SACCO Loans Kenya' on Facebook"></div>
+            <div class="field"><label>Amount Lost (KSh)</label><input id="wh-amt" type="number" placeholder="0" min="0"></div>
+            <div class="field"><label>Scammer's Phone / M-Pesa Till</label><input id="wh-sphone" placeholder="0712345678 or Till #12345"></div>
+            <div class="field"><label>Platform</label><select id="wh-plat"><option>Facebook</option><option>WhatsApp</option><option>TikTok</option><option>Instagram</option><option>Telegram</option><option>Other</option></select></div>
+            <div class="field"><label>Client This Relates To</label><select id="wh-cl"><option value="">Select client...</option></select></div>
+            <div class="field"><label>Description of Incident</label><textarea id="wh-desc" rows="4" placeholder="What happened? What were you promised? How did you pay?"></textarea></div>
+            <button class="btn btn-primary" onclick="submitTip()">🔒 Submit Confidential Report</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-title">📂 Received Tips</div><div id="wh-list"></div></div>
+      </div>
+    </div>
+
+    <!-- BRIEFS -->
+    <div class="view" id="view-briefs">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">⚙️ Brief Configuration</div>
+        <div class="form-grid" style="gap:12px">
+          <div class="field"><label>Select Client</label><select id="br-cl"><option value="">Select client...</option></select></div>
+          <div class="field"><label>Brief Period</label><input id="br-period" placeholder="e.g. Week of 25 April 2026"></div>
+          <div class="field"><label>Analyst Name</label><input id="br-analyst" placeholder="Alex Benard"></div>
+          <div class="field"><label>Include Threat Status</label><select id="br-sf"><option value="">Active + Monitoring + DCI Reported</option><option value="Active">Active only</option><option value="DCI Reported">DCI Reported only</option></select></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="genBrief()">📋 Generate Intelligence Brief</button>
+          <button class="btn btn-outline" onclick="printEl('br-out')">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+      <div id="br-out"></div>
+    </div>
+
+    <!-- DCI -->
+    <div class="view" id="view-dci">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">⚙️ DCI Report Configuration</div>
+        <div class="form-grid" style="gap:12px">
+          <div class="field"><label>Select Client (Complainant)</label><select id="dc-cl" onchange="loadDcThreats()"><option value="">Select client...</option></select></div>
+          <div class="field"><label>Select Fake Account to Report</label><select id="dc-th"><option value="">Select fake account...</option></select></div>
+          <div class="field"><label>Complainant Full Name</label><input id="dc-comp" placeholder="Full legal name"></div>
+          <div class="field"><label>Complainant Phone</label><input id="dc-ph" placeholder="+254 7XX XXX XXX"></div>
+          <div class="field ff"><label>Complainant Address</label><input id="dc-addr" placeholder="Physical address for DCI records"></div>
+          <div class="field ff"><label>Additional Notes / Evidence</label><textarea id="dc-notes" rows="3" placeholder="Transaction IDs, witness info, extra context..."></textarea></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="genDci()">⚖️ Generate DCI Report</button>
+          <button class="btn btn-outline" onclick="printEl('dc-out')">🖨️ Print / Save PDF</button>
+          <button class="btn btn-outline btn-sm" onclick="markDciDone()">✓ Mark Account as DCI Reported</button>
+        </div>
+      </div>
+      <div id="dc-out"></div>
+    </div>
+
+    <!-- TAKEDOWN -->
+    <div class="view" id="view-takedown">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">⚙️ Takedown Letter Configuration</div>
+        <div class="form-grid" style="gap:12px">
+          <div class="field"><label>Select Client</label><select id="td-cl" onchange="loadTdThreats()"><option value="">Select client...</option></select></div>
+          <div class="field"><label>Select Fake Account</label><select id="td-th"><option value="">Select fake account...</option></select></div>
+          <div class="field"><label>Write To Platform</label><select id="td-plat"><option>Meta (Facebook / Instagram)</option><option>TikTok</option><option>Telegram</option><option>WhatsApp / Meta</option></select></div>
+          <div class="field"><label>Sender Name</label><input id="td-sender" placeholder="Alex Benard, Draneb Brand Intelligence"></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="genTakedown()">📩 Generate Takedown Letter</button>
+          <button class="btn btn-outline" onclick="printEl('td-out')">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+      <div id="td-out"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="view" id="view-settings">
+      <div style="max-width:580px">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">👤 Your Profile</div>
+          <div class="form-grid c1" style="gap:12px">
+            <div class="field"><label>Full Name</label><input id="st-name" placeholder="Alex Benard"></div>
+            <div class="field"><label>Brand / Business Name</label><input id="st-brand" placeholder="Draneb Writing &amp; Research Services"></div>
+            <div class="field"><label>Email</label><input id="st-email" type="email" placeholder="dranebresearch@gmail.com"></div>
+            <div class="field"><label>Phone</label><input id="st-phone" placeholder="+254 7XX XXX XXX"></div>
+            <div class="field"><label>Location</label><input id="st-loc" placeholder="Karatina, Nyeri County, Kenya"></div>
+            <div class="field"><label>Upwork Profile URL</label><input id="st-upwork" placeholder="upwork.com/freelancers/draneb"></div>
+            <div class="field"><label>DCI Cybercrime Contact (for report footer)</label><input id="st-dci" placeholder="cybercrime@dci.go.ke / 0800 722 203"></div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:14px" onclick="saveSettings()">💾 Save Settings</button>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">🗃️ Data Management</div>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:14px">All your data is saved locally in this browser. Export regularly for backup.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="exportData()">📤 Export All Data</button>
+            <button class="btn btn-outline" onclick="importData()">📥 Import Data</button>
+            <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ Clear All Data</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">ℹ️ About</div>
+          <p style="font-size:13px;color:var(--text3);line-height:1.9"><strong>Draneb Brand Intelligence Workspace v1.0</strong><br>Built for Alex Benard (Draneb) — BSc Criminology, Karatina University<br>Fraud Monitoring &amp; Digital Brand Protection · Kenya &amp; East Africa</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAL: CLIENT -->
+<div class="modal-overlay" id="m-client">
+  <div class="modal">
+    <div class="modal-hdr"><h3 id="m-cl-title">Add New Client</h3><button class="modal-close" onclick="closeM('m-client')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid" style="gap:12px">
+        <div class="field"><label>Client / Brand Name *</label><input id="cl-name" placeholder="e.g. Nyeri Teachers SACCO"></div>
+        <div class="field"><label>Contact Person</label><input id="cl-contact" placeholder="CEO / Manager name"></div>
+        <div class="field"><label>Phone</label><input id="cl-phone" placeholder="+254 7XX XXX XXX"></div>
+        <div class="field"><label>Email</label><input id="cl-email" type="email" placeholder="contact@example.com"></div>
+        <div class="field"><label>Sector *</label>
+          <select id="cl-sector"><option>SACCO / Financial</option><option>Fintech / Mobile Money</option><option>Politician / Public Figure</option><option>Media / Content Creator</option><option>E-Commerce / Retail</option><option>NGO / Organization</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Service Tier *</label>
+          <select id="cl-tier"><option value="Starter">Starter — KSh 8,000/mo</option><option value="Standard">Standard — KSh 15,000/mo</option><option value="Command">Command — KSh 25,000/mo</option></select>
+        </div>
+        <div class="field"><label>Primary Facebook Page</label><input id="cl-fb" placeholder="facebook.com/..."></div>
+        <div class="field"><label>WhatsApp Business Number</label><input id="cl-wa" placeholder="+254 7XX XXX XXX"></div>
+        <div class="field ff"><label>Notes / Monitoring Requirements</label><textarea id="cl-notes" rows="2" placeholder="Keywords to watch, specific platforms, anything special..."></textarea></div>
+      </div>
+      <input type="hidden" id="cl-id">
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeM('m-client')">Cancel</button><button class="btn btn-primary" onclick="saveClient()">Save Client</button></div>
+  </div>
+</div>
+
+<!-- MODAL: THREAT -->
+<div class="modal-overlay" id="m-threat">
+  <div class="modal">
+    <div class="modal-hdr"><h3>Log Fake Account</h3><button class="modal-close" onclick="closeM('m-threat')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid" style="gap:12px">
+        <div class="field"><label>Fake Account Name *</label><input id="th-name" placeholder="e.g. 'SACCO Emergency Loans Kenya'"></div>
+        <div class="field"><label>Client This Targets *</label><select id="th-cl"><option value="">Select client...</option></select></div>
+        <div class="field"><label>Platform *</label><select id="th-plat"><option>Facebook</option><option>WhatsApp</option><option>TikTok</option><option>Instagram</option><option>Telegram</option><option>Other</option></select></div>
+        <div class="field"><label>Account URL / Link</label><input id="th-url" placeholder="https://..."></div>
+        <div class="field"><label>Scammer's Phone / M-Pesa Till</label><input id="th-phone" placeholder="0712345678 or Till #12345"></div>
+        <div class="field"><label>Estimated Victims</label><input id="th-vics" type="number" placeholder="0" min="0"></div>
+        <div class="field"><label>Estimated Amount Defrauded (KSh)</label><input id="th-amt" type="number" placeholder="0" min="0"></div>
+        <div class="field"><label>Status</label><select id="th-status"><option>Active</option><option>Monitoring</option><option>DCI Reported</option><option>Taken Down</option></select></div>
+        <div class="field ff"><label>Evidence Notes</label><textarea id="th-evid" rows="3" placeholder="Screenshot filenames, victim refs, transaction IDs..."></textarea></div>
+        <div class="field ff"><label>How It Operates</label><textarea id="th-desc" rows="3" placeholder="How do they solicit victims? How do they collect payment?"></textarea></div>
+      </div>
+      <input type="hidden" id="th-id">
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeM('m-threat')">Cancel</button><button class="btn btn-primary" onclick="saveThreat()">Save Record</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+// DATA
+function ls(k){try{return JSON.parse(localStorage.getItem('dbi_'+k)||'null')}catch{return null}}
+function ss(k,v){localStorage.setItem('dbi_'+k,JSON.stringify(v))}
+let D={
+  clients:ls('clients')||[],threats:ls('threats')||[],tips:ls('tips')||[],
+  dciCount:ls('dciCount')||0,
+  settings:ls('settings')||{name:'Alex Benard',brand:'Draneb Writing & Research Services',email:'dranebresearch@gmail.com',phone:'',loc:'Karatina, Nyeri County, Kenya',upwork:'upwork.com/freelancers/draneb',dci:'cybercrime@dci.go.ke'}
+};
+function save(){ss('clients',D.clients);ss('threats',D.threats);ss('tips',D.tips);ss('dciCount',D.dciCount);ss('settings',D.settings)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function tod(){return new Date().toISOString().slice(0,10)}
+function fd(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function fm(n){return'KSh '+Number(n||0).toLocaleString()}
+function ref(p){return p+'-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000)}
+function caseN(){return'DBI-'+new Date().getFullYear()+'-'+String(D.tips.length+1).padStart(4,'0')}
+
+// TOAST
+function toast(msg,type='success'){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className='toast toast-'+type;
+  t.innerHTML=(type==='success'?'✓ ':'⚠ ')+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.animation='slideOut .25s ease forwards';setTimeout(()=>t.remove(),250)},3000);
+}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+function openM(id){document.getElementById(id).classList.add('open')}
+function printEl(id){
+  const el=document.getElementById(id);
+  if(!el||!el.innerHTML.trim()){toast('Generate the document first','error');return}
+  const w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>Draneb Intelligence</title><style>body{font-family:Georgia,serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.8}h1{font-size:20px;border-bottom:2px solid #005533;padding-bottom:8px}h2{font-size:13px;color:#012a18;margin-top:20px;text-transform:uppercase;letter-spacing:.5px;font-family:sans-serif}table{width:100%;border-collapse:collapse;margin:10px 0}td,th{border:1px solid #ccc;padding:7px 10px;font-size:12px}th{background:#f0f0f0}@media print{body{padding:20px}}</style></head><body>'+el.innerHTML+'</body></html>');
+  w.document.close();w.focus();w.print();
+}
+
+// BADGES
+function tierB(t){return`<span class="tier-${t}">${t}</span>`}
+function stB(s){const m={Active:'b-red',Monitoring:'b-gold','DCI Reported':'b-blue','Taken Down':'b-green'};return`<span class="badge ${m[s]||'b-gray'}">${s}</span>`}
+function pfB(p){const i={Facebook:'📘',TikTok:'🎵',WhatsApp:'💬',Instagram:'📸',Telegram:'✈️',Other:'🌐'};return(i[p]||'🌐')+' '+p}
+const tierPrice={Starter:8000,Standard:15000,Command:25000};
+
+// NAV
+const VIEWS={
+  dashboard:{title:'Dashboard',sub:'Overview of all active intelligence operations',actions:()=>''},
+  clients:{title:'Clients',sub:'Manage client accounts and service tiers',actions:()=>'<button class="btn btn-primary" onclick="openAddClient()">+ Add Client</button>'},
+  tracker:{title:'Scammer Tracker',sub:'Log and track all fake accounts by client',actions:()=>'<button class="btn btn-primary" onclick="openAddThreat()">+ Log Fake Account</button>'},
+  whistle:{title:'Whistleblower Vault',sub:'Confidential victim intake and tip management',actions:()=>''},
+  briefs:{title:'Weekly Brief Generator',sub:'Generate intelligence briefs for clients',actions:()=>''},
+  dci:{title:'DCI Report Builder',sub:'Generate Directorate of Criminal Investigations complaints',actions:()=>''},
+  takedown:{title:'Takedown Letter Generator',sub:'Formal removal requests to Meta, TikTok, Telegram',actions:()=>''},
+  settings:{title:'Settings',sub:'Profile, preferences, and data management',actions:()=>''},
+};
+function nav(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+id+"'"))n.classList.add('active')});
+  const m=VIEWS[id];
+  document.getElementById('tb-title').textContent=m.title;
+  document.getElementById('tb-sub').textContent=m.sub;
+  document.getElementById('tb-actions').innerHTML=m.actions();
+  if(id==='dashboard')renderDash();
+  if(id==='clients')renderClients();
+  if(id==='tracker'){populateSels();renderTracker()}
+  if(id==='whistle')renderWhistle();
+  if(id==='briefs'){populateSels();document.getElementById('br-analyst').value=D.settings.name||'Alex Benard';document.getElementById('br-period').value='Week of '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}
+  if(id==='dci')populateSels();
+  if(id==='takedown'){populateSels();document.getElementById('td-sender').value=(D.settings.name||'Alex Benard')+', Draneb Brand Intelligence'}
+  if(id==='settings')loadSettings();
+}
+
+function badges(){
+  document.getElementById('nb-clients').textContent=D.clients.filter(c=>c.status==='Active').length;
+  document.getElementById('nb-threats').textContent=D.threats.filter(t=>t.status==='Active').length;
+  document.getElementById('nb-tips').textContent=D.tips.filter(t=>!t.reviewed).length;
+  document.getElementById('sb-analyst').textContent=D.settings.name||'Alex Benard';
+}
+
+function populateSels(){
+  ['th-cl','br-cl','dc-cl','td-cl','wh-cl','tf-client'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const v=el.value;
+    const pre=id==='tf-client'?'<option value="">All Clients</option>':'<option value="">Select client...</option>';
+    el.innerHTML=pre+D.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    el.value=v;
+  });
+}
+
+// DASHBOARD
+function renderDash(){
+  const active=D.clients.filter(c=>c.status==='Active');
+  const actTh=D.threats.filter(t=>t.status==='Active');
+  document.getElementById('ds-cl').textContent=active.length;
+  document.getElementById('ds-cl-s').textContent=active.length+' active client'+(active.length!==1?'s':'');
+  document.getElementById('ds-th').textContent=actTh.length;
+  document.getElementById('ds-th-s').textContent=D.threats.filter(t=>t.dateFound===tod()).length+' logged today';
+  document.getElementById('ds-ti').textContent=D.tips.length;
+  document.getElementById('ds-dc').textContent=D.dciCount;
+  const recent=[...D.threats].sort((a,b)=>b.dateFound.localeCompare(a.dateFound)).slice(0,5);
+  const dtEl=document.getElementById('d-threats');
+  if(!recent.length){dtEl.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">No threats logged yet</div><div class="empty-sub">Add a client then log fake accounts you find.</div></div>';return}
+  dtEl.innerHTML='<table><thead><tr><th>Fake Account</th><th>Platform</th><th>Client</th><th>Status</th></tr></thead><tbody>'+recent.map(t=>{const cl=D.clients.find(c=>c.id===t.clientId);return`<tr><td><strong>${t.name}</strong></td><td>${pfB(t.platform)}</td><td style="font-size:12px">${cl?.name||'—'}</td><td>${stB(t.status)}</td></tr>`}).join('')+'</tbody></table>';
+  const trs=['Starter','Standard','Command'];
+  let rev=0;
+  document.getElementById('d-tiers').innerHTML=trs.map(t=>{const cnt=active.filter(c=>c.tier===t).length;rev+=cnt*tierPrice[t];if(!cnt)return'';const pct=active.length?Math.round(cnt/active.length*100):0;return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px"><span>${tierB(t)}</span><span style="font-weight:600">${cnt}</span></div><div class="progress-wrap"><div class="progress-fill" style="width:${pct}%"></div></div></div>`}).join('')||'<p style="font-size:13px;color:var(--text3)">No active clients.</p>';
+  document.getElementById('d-rev').innerHTML=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text3)">Monthly Revenue</span><strong style="color:var(--g600)">${fm(rev)}</strong></div><div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px"><span style="color:var(--text3)">Annual Projection</span><strong style="color:var(--g600)">${fm(rev*12)}</strong></div>`;
+  const acts=[];
+  D.tips.filter(t=>!t.reviewed).forEach(t=>acts.push({icon:'🔒',txt:'Unreviewed tip: Case '+t.caseNum,type:'warn'}));
+  actTh.slice(0,3).forEach(t=>acts.push({icon:'⚠️',txt:`Active threat needs DCI report: "${t.name}"`,type:'error'}));
+  if(!D.clients.length)acts.push({icon:'👤',txt:'Add your first client to get started',type:'info'});
+  if(!acts.length)acts.push({icon:'✓',txt:'All action items cleared. Great work!',type:'success'});
+  const tm={warn:'alert-warn',error:'alert-error',info:'alert-info',success:'alert-success'};
+  document.getElementById('d-actions').innerHTML=acts.map(a=>`<div class="alert ${tm[a.type]}"><span>${a.icon}</span><span>${a.txt}</span></div>`).join('');
+}
+
+// CLIENTS
+function openAddClient(id){
+  document.getElementById('m-cl-title').textContent=id?'Edit Client':'Add New Client';
+  ['cl-name','cl-contact','cl-phone','cl-email','cl-fb','cl-wa','cl-notes'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('cl-id').value='';
+  if(id){const c=D.clients.find(x=>x.id===id);if(!c)return;document.getElementById('cl-name').value=c.name;document.getElementById('cl-contact').value=c.contact||'';document.getElementById('cl-phone').value=c.phone||'';document.getElementById('cl-email').value=c.email||'';document.getElementById('cl-sector').value=c.sector||'SACCO / Financial';document.getElementById('cl-tier').value=c.tier||'Starter';document.getElementById('cl-fb').value=c.fb||'';document.getElementById('cl-wa').value=c.wa||'';document.getElementById('cl-notes').value=c.notes||'';document.getElementById('cl-id').value=id}
+  openM('m-client');
+}
+function saveClient(){
+  const name=document.getElementById('cl-name').value.trim();
+  if(!name){toast('Client name is required','error');return}
+  const eid=document.getElementById('cl-id').value;
+  const r={id:eid||uid(),name,contact:document.getElementById('cl-contact').value,phone:document.getElementById('cl-phone').value,email:document.getElementById('cl-email').value,sector:document.getElementById('cl-sector').value,tier:document.getElementById('cl-tier').value,fb:document.getElementById('cl-fb').value,wa:document.getElementById('cl-wa').value,notes:document.getElementById('cl-notes').value,since:eid?D.clients.find(c=>c.id===eid)?.since:tod(),status:'Active'};
+  if(eid){D.clients=D.clients.map(c=>c.id===eid?r:c)}else{D.clients.push(r)}
+  save();closeM('m-client');populateSels();badges();renderClients();toast(eid?'Client updated':'Client added');
+}
+function delClient(id){
+  if(!confirm('Delete client and all their threat records?'))return;
+  D.clients=D.clients.filter(c=>c.id!==id);D.threats=D.threats.filter(t=>t.clientId!==id);
+  save();populateSels();badges();renderClients();toast('Client removed');
+}
+function renderClients(){
+  const tb=document.getElementById('cl-tbody');
+  if(!D.clients.length){tb.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">No clients yet</div><div class="empty-sub">Add your first client to begin monitoring.</div></div></td></tr>';return}
+  tb.innerHTML=D.clients.map(c=>{const th=D.threats.filter(t=>t.clientId===c.id&&t.status==='Active').length;return`<tr><td><strong>${c.name}</strong><br><span style="font-size:11px;color:var(--text3)">${c.contact||''}</span></td><td style="font-size:12px">${c.sector}</td><td>${tierB(c.tier)}</td><td style="font-weight:600;color:var(--g600)">${fm(tierPrice[c.tier])}</td><td><span class="badge ${th?'b-red':'b-green'}">${th} active</span></td><td style="font-size:12px;color:var(--text3)">${fd(c.since)}</td><td><span class="badge b-green">Active</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-xs" onclick="openAddClient('${c.id}')">Edit</button> <button class="btn btn-danger btn-xs" onclick="delClient('${c.id}')">Delete</button></td></tr>`}).join('');
+}
+
+// SCAMMER TRACKER
+function openAddThreat(id){
+  populateSels();
+  ['th-name','th-url','th-phone','th-evid','th-desc'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('th-vics').value='0';document.getElementById('th-amt').value='0';
+  document.getElementById('th-plat').value='Facebook';document.getElementById('th-status').value='Active';document.getElementById('th-id').value='';
+  if(id){const t=D.threats.find(x=>x.id===id);if(!t)return;document.getElementById('th-name').value=t.name;document.getElementById('th-cl').value=t.clientId;document.getElementById('th-plat').value=t.platform;document.getElementById('th-url').value=t.url||'';document.getElementById('th-phone').value=t.phone||'';document.getElementById('th-vics').value=t.victims||0;document.getElementById('th-amt').value=t.amount||0;document.getElementById('th-status').value=t.status;document.getElementById('th-evid').value=t.evidence||'';document.getElementById('th-desc').value=t.desc||'';document.getElementById('th-id').value=id}
+  openM('m-threat');
+}
+function saveThreat(){
+  const name=document.getElementById('th-name').value.trim();const cid=document.getElementById('th-cl').value;
+  if(!name||!cid){toast('Account name and client required','error');return}
+  const eid=document.getElementById('th-id').value;
+  const r={id:eid||uid(),name,clientId:cid,platform:document.getElementById('th-plat').value,url:document.getElementById('th-url').value,phone:document.getElementById('th-phone').value,victims:parseInt(document.getElementById('th-vics').value)||0,amount:parseInt(document.getElementById('th-amt').value)||0,status:document.getElementById('th-status').value,evidence:document.getElementById('th-evid').value,desc:document.getElementById('th-desc').value,dateFound:eid?D.threats.find(t=>t.id===eid)?.dateFound:tod()};
+  if(eid){D.threats=D.threats.map(t=>t.id===eid?r:t)}else{D.threats.push(r)}
+  save();closeM('m-threat');badges();renderTracker();toast(eid?'Record updated':'Fake account logged');
+}
+function delThreat(id){if(!confirm('Delete this record?'))return;D.threats=D.threats.filter(t=>t.id!==id);save();badges();renderTracker();toast('Record deleted')}
+function renderTracker(){
+  const fc=document.getElementById('tf-client')?.value||'';const fs=document.getElementById('tf-status')?.value||'';const fp=document.getElementById('tf-plat')?.value||'';
+  let list=[...D.threats];
+  if(fc)list=list.filter(t=>t.clientId===fc);if(fs)list=list.filter(t=>t.status===fs);if(fp)list=list.filter(t=>t.platform===fp);
+  list.sort((a,b)=>b.dateFound.localeCompare(a.dateFound));
+  const tb=document.getElementById('tr-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">No records found</div><div class="empty-sub">Log a fake account using the button above.</div></div></td></tr>';return}
+  tb.innerHTML=list.map(t=>{const cl=D.clients.find(c=>c.id===t.clientId);return`<tr><td><strong>${t.name}</strong>${t.url?`<br><a href="${t.url}" target="_blank" style="font-size:11px;color:var(--blue)">View →</a>`:''}</td><td style="font-size:12px">${cl?.name||'—'}</td><td style="font-size:12px">${pfB(t.platform)}</td><td style="font-family:var(--mono);font-size:11px">${t.phone||'—'}</td><td style="font-weight:600;color:${t.victims>0?'var(--red)':'var(--text3)'}">${t.victims||0}</td><td style="font-size:12px;color:var(--text3)">${fd(t.dateFound)}</td><td>${stB(t.status)}</td><td style="font-size:11px;color:var(--text3);max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.evidence||'—'}</td><td style="white-space:nowrap"><button class="btn btn-outline btn-xs" onclick="openAddThreat('${t.id}')">Edit</button> <button class="btn btn-danger btn-xs" onclick="delThreat('${t.id}')">×</button></td></tr>`}).join('');
+}
+
+// WHISTLEBLOWER
+function renderWhistle(){
+  document.getElementById('wh-next').textContent=caseN();populateSels();
+  const el=document.getElementById('wh-list');
+  if(!D.tips.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-title">No tips yet</div><div class="empty-sub">Submitted reports appear here.</div></div>';return}
+  el.innerHTML=[...D.tips].reverse().map(t=>`<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;background:${t.reviewed?'var(--bg)':'var(--white)'}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-family:var(--mono);font-size:11px;color:var(--g600)">${t.caseNum}</span><div style="display:flex;gap:5px"><span class="badge ${t.reviewed?'b-green':'b-gold'}">${t.reviewed?'Reviewed':'New'}</span><button class="btn btn-outline btn-xs" onclick="reviewTip('${t.id}')">${t.reviewed?'Unmark':'✓'}</button><button class="btn btn-danger btn-xs" onclick="delTip('${t.id}')">×</button></div></div><div style="font-size:12px;color:var(--text3);line-height:1.9"><strong>Victim:</strong> ${t.victimName} &nbsp;·&nbsp; <strong>Platform:</strong> ${t.platform} &nbsp;·&nbsp; <strong>Lost:</strong> ${fm(t.amount)}<br><strong>Fake account:</strong> ${t.account}<br><strong>Scammer contact:</strong> ${t.scammerPhone||'—'}<br><strong>Date:</strong> ${fd(t.date)}${t.desc?'<br><strong>Details:</strong> '+t.desc.slice(0,100)+(t.desc.length>100?'...':''):''}</div></div>`).join('');
+}
+function submitTip(){
+  const acct=document.getElementById('wh-acct').value.trim();if(!acct){toast('Enter the fake account name','error');return}
+  const tip={id:uid(),caseNum:caseN(),victimName:document.getElementById('wh-vname').value.trim()||'Anonymous',phone:document.getElementById('wh-vphone').value,account:acct,amount:document.getElementById('wh-amt').value||0,scammerPhone:document.getElementById('wh-sphone').value,platform:document.getElementById('wh-plat').value,clientId:document.getElementById('wh-cl').value,desc:document.getElementById('wh-desc').value,date:tod(),reviewed:false};
+  D.tips.push(tip);save();['wh-vname','wh-vphone','wh-acct','wh-amt','wh-sphone','wh-desc'].forEach(f=>document.getElementById(f).value='');
+  badges();renderWhistle();toast('Tip recorded — Case '+tip.caseNum);
+}
+function reviewTip(id){D.tips=D.tips.map(t=>t.id===id?{...t,reviewed:!t.reviewed}:t);save();badges();renderWhistle()}
+function delTip(id){if(!confirm('Delete tip?'))return;D.tips=D.tips.filter(t=>t.id!==id);save();badges();renderWhistle();toast('Tip deleted')}
+
+// BRIEF GENERATOR
+function genBrief(){
+  const cid=document.getElementById('br-cl').value;if(!cid){toast('Select a client','error');return}
+  const cl=D.clients.find(c=>c.id===cid);
+  const period=document.getElementById('br-period').value||'Current Week';
+  const analyst=document.getElementById('br-analyst').value||D.settings.name||'Alex Benard';
+  const sf=document.getElementById('br-sf').value;
+  let ths=D.threats.filter(t=>t.clientId===cid);
+  if(sf)ths=ths.filter(t=>t.status===sf);else ths=ths.filter(t=>['Active','Monitoring','DCI Reported'].includes(t.status));
+  const tips=D.tips.filter(t=>t.clientId===cid);
+  const totV=ths.reduce((s,t)=>s+Number(t.victims||0),0);
+  const totA=ths.reduce((s,t)=>s+Number(t.amount||0),0);
+  const actTh=ths.filter(t=>t.status==='Active');
+  const dciTh=ths.filter(t=>t.status==='DCI Reported');
+  const dnTh=ths.filter(t=>t.status==='Taken Down');
+  const rn=ref('DBR');
+  const dt=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('br-out').innerHTML=`<div class="doc-out"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h1>INTELLIGENCE BRIEF</h1><div style="font-size:12px;color:#666;margin-top:6px;line-height:2"><strong>Prepared for:</strong> ${cl.name} (${cl.tier} Tier)<br><strong>Period:</strong> ${period}<br><strong>Reference:</strong> <span class="doc-ref">${rn}</span><br><strong>Analyst:</strong> ${analyst} — Draneb Brand Intelligence<br><strong>Date:</strong> ${dt} &nbsp;|&nbsp; <strong>Classification:</strong> CONFIDENTIAL</div></div><div style="text-align:right;font-size:12px;color:#888"><div style="font-size:20px;font-weight:700;color:#005533">DRANEB</div><div>Brand Intelligence</div></div></div>
+  <div style="background:#fff8e6;border-left:4px solid #c8960c;padding:12px 16px;margin-bottom:16px;border-radius:4px;font-size:13px"><strong>EXECUTIVE SUMMARY:</strong> This brief identifies <strong>${ths.length} threat(s)</strong> currently impersonating or exploiting the ${cl.name} brand. ${actTh.length} remain active. Estimated exposure: <strong>${fm(totA)}</strong> across <strong>${totV}</strong> reported victims.</div>
+  <h2>1. Threat Inventory</h2>${ths.length?`<table><thead><tr><th>#</th><th>Fake Account</th><th>Platform</th><th>Phone/Till</th><th>Victims</th><th>Est. Defrauded</th><th>Status</th></tr></thead><tbody>${ths.map((t,i)=>`<tr><td>${i+1}</td><td><strong>${t.name}</strong>${t.url?`<br><small>${t.url}</small>`:''}</td><td>${t.platform}</td><td>${t.phone||'—'}</td><td>${t.victims||0}</td><td>${fm(t.amount)}</td><td>${t.status}</td></tr>`).join('')}<tr style="background:#f8f8f8"><td colspan="4"><strong>TOTALS</strong></td><td><strong>${totV}</strong></td><td><strong>${fm(totA)}</strong></td><td></td></tr></tbody></table>`:'<p><em>No threats on record for this period.</em></p>'}
+  <h2>2. Active Threats — Recommended Actions</h2>${actTh.length?actTh.map((t,i)=>`<h3>${i+1}. ${t.name} (${t.platform})</h3><p>${t.desc||'Fake account impersonating '+cl.name+' to solicit M-Pesa payments.'}</p><table style="font-size:12px"><tr><td><strong>URL</strong></td><td>${t.url||'—'}</td></tr><tr><td><strong>Contact used</strong></td><td>${t.phone||'—'}</td></tr><tr><td><strong>Victims (est.)</strong></td><td>${t.victims||0}</td></tr><tr><td><strong>Evidence</strong></td><td>${t.evidence||'—'}</td></tr></table><p><strong>Recommended:</strong> (1) File DCI Cybercrime complaint. (2) Submit platform takedown request. (3) Post public warning on official ${cl.name} channels.</p>`).join(''):'<p>No active threats this period.</p>'}
+  <h2>3. Whistleblower Vault Summary</h2><p>${tips.length} tip(s) received for ${cl.name}. ${tips.filter(t=>!t.reviewed).length} pending review.</p>${tips.length?`<table><thead><tr><th>Case #</th><th>Fake Account</th><th>Platform</th><th>Amount Lost</th><th>Date</th></tr></thead><tbody>${tips.map(t=>`<tr><td>${t.caseNum}</td><td>${t.account}</td><td>${t.platform}</td><td>${fm(t.amount)}</td><td>${fd(t.date)}</td></tr>`).join('')}</tbody></table>`:''}
+  <h2>4. Status Summary</h2><table><tr><td><strong>Active threats</strong></td><td>${actTh.length}</td></tr><tr><td><strong>Reported to DCI</strong></td><td>${dciTh.length}</td></tr><tr><td><strong>Taken down</strong></td><td>${dnTh.length}</td></tr><tr><td><strong>Victim tips</strong></td><td>${tips.length}</td></tr></table>
+  <h2>5. Criminological Analysis</h2><p>The fake accounts identified follow a common East African digital fraud pattern: impersonation of a trusted brand, urgent call to action (emergency loans, exclusive offers, free registration), and M-Pesa collection via personal numbers to avoid traceable bank transfers. Scammers exploit the community trust built by ${cl.name}. Primary target demographic: low-income mobile users unable to verify account authenticity online.</p><p><strong>Countermeasure:</strong> Regular public alerts on ${cl.name}'s verified channels confirming that ${cl.name} never solicits payments via personal M-Pesa numbers.</p>
+  <div style="margin-top:40px;border-top:1px solid #ccc;padding-top:16px"><p><strong>${analyst}</strong><br>Draneb Brand Intelligence<br>${D.settings.email||'dranebresearch@gmail.com'} · ${D.settings.phone||''}</p><p style="font-size:11px;color:#888;margin-top:12px">CONFIDENTIAL — Prepared exclusively for ${cl.name}. Ref: ${rn}</p></div></div>`;
+  toast('Brief generated — use Print button to save as PDF');
+}
+
+// DCI REPORT
+function loadDcThreats(){
+  const cid=document.getElementById('dc-cl').value;
+  const cl=D.clients.find(c=>c.id===cid);
+  if(cl){document.getElementById('dc-comp').value=cl.contact||cl.name;document.getElementById('dc-ph').value=cl.phone||''}
+  const sel=document.getElementById('dc-th');
+  const ths=D.threats.filter(t=>t.clientId===cid&&t.status!=='Taken Down');
+  sel.innerHTML='<option value="">Select fake account...</option>'+ths.map(t=>`<option value="${t.id}">${t.name} (${t.platform})</option>`).join('');
+}
+function markDciDone(){
+  const id=document.getElementById('dc-th').value;if(!id){toast('Select a fake account','error');return}
+  D.threats=D.threats.map(t=>t.id===id?{...t,status:'DCI Reported'}:t);D.dciCount=(D.dciCount||0)+1;
+  save();loadDcThreats();badges();toast('Marked as DCI Reported');
+}
+function genDci(){
+  const cid=document.getElementById('dc-cl').value;const tid=document.getElementById('dc-th').value;
+  if(!cid||!tid){toast('Select a client and fake account','error');return}
+  const cl=D.clients.find(c=>c.id===cid);const th=D.threats.find(t=>t.id===tid);
+  const comp=document.getElementById('dc-comp').value||cl.name;
+  const ph=document.getElementById('dc-ph').value||cl.phone||'—';
+  const addr=document.getElementById('dc-addr').value||D.settings.loc||'—';
+  const notes=document.getElementById('dc-notes').value;
+  const rn=ref('DCI');const dt=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('dc-out').innerHTML=`<div class="doc-out"><div style="text-align:center;margin-bottom:20px"><div style="font-size:11px;letter-spacing:2px;color:#666;margin-bottom:4px">KENYA — DIRECTORATE OF CRIMINAL INVESTIGATIONS</div><h1 style="font-size:22px;border:none;padding:0;margin-bottom:4px">CYBERCRIME COMPLAINT FORM</h1><div style="font-size:11px;color:#888">Ref: <strong>${rn}</strong> &nbsp;·&nbsp; Date: ${dt}</div></div>
+  <div style="background:#f8f8f8;padding:12px;border-radius:4px;margin-bottom:16px;font-size:12px;color:#666">Submit to: <strong>DCI Cybercrime Unit</strong> · DCI Headquarters, Kiambu Road, Nairobi · cybercrime@dci.go.ke · Hotline: 0800 722 203</div>
+  <h2>Section A — Complainant Details</h2><table><tr><td width="40%"><strong>Full Name</strong></td><td>${comp}</td></tr><tr><td><strong>Organization</strong></td><td>${cl.name}</td></tr><tr><td><strong>Phone</strong></td><td>${ph}</td></tr><tr><td><strong>Email</strong></td><td>${cl.email||'—'}</td></tr><tr><td><strong>Physical Address</strong></td><td>${addr}</td></tr><tr><td><strong>Report Prepared By</strong></td><td>${D.settings.name||'Alex Benard'} — Draneb Brand Intelligence (Authorized Analyst)</td></tr></table>
+  <h2>Section B — Nature of Offence</h2><table><tr><td width="40%"><strong>Type of Offence</strong></td><td>Online Impersonation / Brand Fraud / Obtaining by False Pretences</td></tr><tr><td><strong>Relevant Statute</strong></td><td>Computer Misuse &amp; Cybercrimes Act 2018, Sections 26 &amp; 27; Penal Code Cap 63 Section 296</td></tr><tr><td><strong>Date First Detected</strong></td><td>${fd(th.dateFound)}</td></tr><tr><td><strong>Date of Report</strong></td><td>${dt}</td></tr></table>
+  <h2>Section C — Fraudulent Account Details</h2><table><tr><td width="40%"><strong>Fake Account Name</strong></td><td>${th.name}</td></tr><tr><td><strong>Platform</strong></td><td>${th.platform}</td></tr><tr><td><strong>Account URL</strong></td><td>${th.url||'Available on request'}</td></tr><tr><td><strong>Phone / M-Pesa Till</strong></td><td>${th.phone||'—'}</td></tr><tr><td><strong>Estimated Victims</strong></td><td>${th.victims||0}</td></tr><tr><td><strong>Estimated Defrauded</strong></td><td>${fm(th.amount)}</td></tr><tr><td><strong>Evidence</strong></td><td>${th.evidence||'Screenshots available on request'}</td></tr></table>
+  <h2>Section D — Description of Fraud Method</h2><p>${th.desc||'The suspect(s) created a fraudulent account impersonating '+cl.name+', using similar branding to deceive the public into making M-Pesa transfers under false pretences.'}</p>${notes?'<p><strong>Additional Notes:</strong> '+notes+'</p>':''}
+  <h2>Section E — Victims / Witnesses</h2>${D.tips.filter(t=>t.clientId===cid).length?D.tips.filter(t=>t.clientId===cid).map(t=>`<p>Case ${t.caseNum}: ${t.victimName} — lost: ${fm(t.amount)} — scammer contact: ${t.scammerPhone||'unknown'}</p>`).join(''):'<p>Victim testimony available through Draneb Brand Intelligence whistleblower vault on request.</p>'}
+  <h2>Section F — Declaration</h2><p>I, <strong>${comp}</strong>, declare that the information in this complaint is true and accurate to the best of my knowledge, submitted in good faith under the Computer Misuse &amp; Cybercrimes Act 2018.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;border-top:1px solid #ccc;padding-top:20px"><div><p style="border-bottom:1px solid #999;padding-bottom:44px"></p><p style="font-size:12px"><strong>${comp}</strong><br>Complainant Signature · ${dt}</p></div><div><p style="border-bottom:1px solid #999;padding-bottom:44px"></p><p style="font-size:12px"><strong>Receiving Officer</strong><br>DCI Cybercrime Unit · Badge: ____________</p></div></div>
+  <p style="font-size:11px;color:#999;margin-top:16px;text-align:center">Ref: ${rn} · Prepared by Draneb Brand Intelligence · ${D.settings.email||''}</p></div>`;
+  toast('DCI Report generated — review and submit to DCI Cybercrime Unit');
+}
+
+// TAKEDOWN LETTER
+function loadTdThreats(){
+  const cid=document.getElementById('td-cl').value;
+  const sel=document.getElementById('td-th');
+  const ths=D.threats.filter(t=>t.clientId===cid&&t.status!=='Taken Down');
+  sel.innerHTML='<option value="">Select fake account...</option>'+ths.map(t=>`<option value="${t.id}">${t.name} (${t.platform})</option>`).join('');
+}
+function genTakedown(){
+  const cid=document.getElementById('td-cl').value;const tid=document.getElementById('td-th').value;
+  if(!cid||!tid){toast('Select a client and fake account','error');return}
+  const cl=D.clients.find(c=>c.id===cid);const th=D.threats.find(t=>t.id===tid);
+  const plat=document.getElementById('td-plat').value;
+  const sender=document.getElementById('td-sender').value||D.settings.name+', Draneb Brand Intelligence';
+  const rn=ref('TKD');const dt=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const addrs={'Meta (Facebook / Instagram)':'Meta Platforms Inc.\nContent Review Team\nhttps://www.facebook.com/help/contact/208282075858952','TikTok':'TikTok Legal Team\nhttps://www.tiktok.com/legal/report/user\nEmail: legal@tiktok.com','Telegram':'Telegram Support\nhttps://telegram.org/support\nEmail: abuse@telegram.org','WhatsApp / Meta':'Meta / WhatsApp Trust & Safety\nhttps://faq.whatsapp.com/563197044391620'};
+  document.getElementById('td-out').innerHTML=`<div class="doc-out"><p style="color:#888;font-size:12px;margin-bottom:12px">${dt}</p><p style="white-space:pre-line;font-size:13px;color:#444;margin-bottom:20px">${addrs[plat]||plat+' Trust & Safety Team'}</p>
+  <p><strong>RE: URGENT TAKEDOWN REQUEST — Impersonation / Brand Fraud</strong><br><strong>Reference:</strong> ${rn}<br><strong>Infringing Content:</strong> "${th.name}" on ${th.platform}</p>
+  <p>Dear ${plat} Trust &amp; Safety Team,</p>
+  <p>I write on behalf of <strong>${cl.name}</strong> (${cl.sector}) to formally request the immediate removal of the fraudulent account detailed below, which is impersonating our client in violation of your platform's Terms of Service and the Kenya Computer Misuse &amp; Cybercrimes Act 2018.</p>
+  <h2>Infringing Account Details</h2><table><tr><td width="40%"><strong>Account / Page Name</strong></td><td>${th.name}</td></tr><tr><td><strong>Platform</strong></td><td>${th.platform}</td></tr><tr><td><strong>URL / Profile Link</strong></td><td>${th.url||'Available on request'}</td></tr><tr><td><strong>Contact Used</strong></td><td>${th.phone||'—'}</td></tr><tr><td><strong>Date Discovered</strong></td><td>${fd(th.dateFound)}</td></tr></table>
+  <h2>Nature of Infringement</h2><p>The above account is <strong>impersonating ${cl.name}</strong> by using our client's brand name and identity to deceive the public into making financial payments via M-Pesa under false pretences. This violates your platform's policies on: (a) impersonation of individuals and organizations; (b) fraudulent and deceptive conduct; (c) coordinated inauthentic behaviour.</p>${th.desc?'<p>'+th.desc+'</p>':''}
+  <h2>Evidence of Fraud</h2><p>${th.evidence||'Screenshots of the fraudulent account, victim testimonies, and M-Pesa transaction records are held and available to your trust &amp; safety team on request.'}</p><p>Estimated victims: <strong>${th.victims||0}</strong>. Estimated losses: <strong>${fm(th.amount)}</strong>.</p>
+  <h2>Relief Requested</h2><p>1. <strong>Immediate suspension</strong> of the infringing account pending investigation.<br>2. <strong>Permanent removal</strong> upon confirmation of fraudulent activity.<br>3. <strong>Preservation of records</strong> (IP logs, account data, payment info) to assist the Kenya DCI Cybercrime Unit.<br>4. <strong>Written confirmation</strong> of action taken, referencing case number ${rn}.</p>
+  <p>A parallel complaint has been filed with the Kenya DCI Cybercrime Unit. Their contact for platform liaison: ${D.settings.dci||'cybercrime@dci.go.ke / 0800 722 203'}.</p>
+  <p>We trust your platform will act swiftly to protect ${cl.name}'s community from further harm.</p>
+  <div style="margin-top:40px;border-top:1px solid #ccc;padding-top:16px"><p>Yours faithfully,</p><p style="margin-top:24px"><strong>${sender}</strong><br>${D.settings.brand||'Draneb Brand Intelligence'}<br>${D.settings.email||'dranebresearch@gmail.com'} · ${D.settings.phone||''}<br>${D.settings.loc||'Karatina, Nyeri County, Kenya'}</p><p style="font-size:11px;color:#999;margin-top:12px">Acting as authorized intelligence analyst for ${cl.name} (Ref: ${rn})</p></div></div>`;
+  toast('Takedown letter generated — print or copy to email');
+}
+
+// SETTINGS
+function loadSettings(){const s=D.settings;['name','brand','email','phone','loc','upwork','dci'].forEach(k=>{const el=document.getElementById('st-'+k);if(el)el.value=s[k]||''})}
+function saveSettings(){D.settings={name:document.getElementById('st-name').value,brand:document.getElementById('st-brand').value,email:document.getElementById('st-email').value,phone:document.getElementById('st-phone').value,loc:document.getElementById('st-loc').value,upwork:document.getElementById('st-upwork').value,dci:document.getElementById('st-dci').value};save();document.getElementById('sb-analyst').textContent=D.settings.name||'Alex Benard';toast('Settings saved')}
+function exportData(){const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='draneb-data-'+tod()+'.json';a.click();toast('Data exported')}
+function importData(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{D=JSON.parse(ev.target.result);save();badges();nav('dashboard');toast('Data imported')}catch{toast('Invalid file','error')}};r.readAsText(f)};i.click()}
+function clearAll(){if(!confirm('Delete ALL data permanently?'))return;['clients','threats','tips','dciCount'].forEach(k=>localStorage.removeItem('dbi_'+k));D={clients:[],threats:[],tips:[],dciCount:0,settings:D.settings};save();badges();nav('dashboard');toast('All data cleared')}
+
+// INIT
+badges();
+nav('dashboard');
+</script>
+</body>
+</html>
